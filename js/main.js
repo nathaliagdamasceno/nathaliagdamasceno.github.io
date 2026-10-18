@@ -154,20 +154,38 @@
         if (link) {
           link.classList.add('is-active');
           link.setAttribute('aria-current', 'true');
-          // no celular a pílula rola na horizontal: centraliza o item ativo
-          if (portraitQuery.matches) {
-            nav.scrollTo({ left: link.offsetLeft - (nav.clientWidth - link.offsetWidth) / 2, behavior: 'smooth' });
-          }
         }
         activeLink = link;
       }
 
-      // ganha fundo assim que o conteúdo depois do hero passa por trás dela
-      // (no celular só aparece depois que a frase do hero já subiu)
+      // no topo mostra os nomes; começou a rolar, vira só bolinhas
+      // (no celular, onde fica escondido no hero, só aparece depois que a frase do hero subiu)
       const heroBottom = hero ? hero.getBoundingClientRect().bottom : 0;
-      const navRect = nav.getBoundingClientRect();
-      const threshold = portraitQuery.matches ? navRect.top - 120 : navRect.bottom + 8;
-      nav.classList.toggle('is-floating', heroBottom < threshold);
+      const floating = portraitQuery.matches
+        ? heroBottom < nav.getBoundingClientRect().top - 120
+        : window.scrollY > 40;
+      nav.classList.toggle('is-floating', floating);
+    });
+  }
+
+  /* ------------------------------------------------------------------------
+     Experiência: parallax — cada bloco recebe --p (-1 → 1) conforme cruza a tela
+     ------------------------------------------------------------------------ */
+  const jobs = [...document.querySelectorAll('.job')];
+
+  if (jobs.length && !reduceMotion) {
+    scrollTasks.push(() => {
+      const vh = window.innerHeight;
+      jobs.forEach((job) => {
+        const r = job.getBoundingClientRect();
+        if (r.bottom < -vh * 0.5 || r.top > vh * 1.5) return;
+        const p = clamp((vh / 2 - (r.top + r.height / 2)) / (vh / 2 + r.height / 2), -1, 1);
+        job.style.setProperty('--p', p.toFixed(3));
+        // espaço livre para o nome da empresa descer dentro do bloco
+        const head = job.querySelector('.job__head');
+        const pad = parseFloat(getComputedStyle(job).paddingTop) * 2;
+        job.style.setProperty('--travel', `${Math.max(0, job.clientHeight - head.offsetHeight - pad)}px`);
+      });
     });
   }
 

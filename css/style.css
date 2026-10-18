@@ -312,14 +312,6 @@ a {
   transition: background-color 0.5s, box-shadow 0.5s, backdrop-filter 0.5s;
 }
 
-/* Fora do hero ganha um fundo de vidro para não brigar com o conteúdo */
-.section-nav.is-floating {
-  background-color: var(--glass-bg);
-  box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-}
-
 .section-nav:not(.is-floating) {
   color: var(--ink-deep);
 }
@@ -336,38 +328,105 @@ a {
 
 .section-nav a {
   display: flex;
-  align-items: baseline;
-  gap: 0.7em;
+  align-items: center;
+  justify-content: flex-end;
   padding: 2px 0;
   line-height: 1.35;
   text-decoration: none;
+}
+
+.section-nav__label {
+  max-width: 12em;
+  overflow: hidden;
+  white-space: nowrap;
   opacity: 0.5;
-  transition: opacity 0.4s;
+  transition: max-width 0.5s var(--ease-out), margin 0.5s var(--ease-out), opacity 0.4s;
 }
 
-/* traço que cresce na frente do item ativo */
-.section-nav a::before {
-  content: "";
-  align-self: center;
+.section-nav a:hover .section-nav__label,
+.section-nav a:focus-visible .section-nav__label,
+.section-nav a.is-active .section-nav__label {
+  opacity: 1;
+}
+
+/* bolinha: escondida no hero, aparece quando a página rola */
+.section-nav__dot {
+  display: grid;
+  place-items: center;
   width: 0;
-  height: 1.5px;
-  margin-right: -0.7em;
+  height: 16px;
+  overflow: hidden;
+  transition: width 0.5s var(--ease-out);
+}
+
+.section-nav__dot::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   background: currentColor;
-  transition: width 0.5s var(--ease-out), margin 0.5s var(--ease-out);
+  box-shadow: 0 0 0 2px rgb(243 238 232 / 0.75);
+  opacity: 0.45;
+  transition: width 0.4s var(--ease-out), height 0.4s var(--ease-out), opacity 0.4s;
 }
 
-.section-nav a:hover,
-.section-nav a:focus-visible {
+/* a seção que está na tela deixa a bolinha maior */
+.section-nav a.is-active .section-nav__dot::before {
+  width: 13px;
+  height: 13px;
   opacity: 1;
 }
 
-.section-nav a.is-active {
+/* Rolando: só as bolinhas, sem fundo, para não cobrir o conteúdo */
+.section-nav.is-floating a {
+  padding: 3px 0;
+}
+
+.section-nav.is-floating .section-nav__label {
+  max-width: 0;
+  opacity: 0;
+}
+
+.section-nav.is-floating .section-nav__dot {
+  width: 16px;
+}
+
+/* Mouse em cima (ou foco pelo teclado): abre com os nomes, em vidro */
+.section-nav.is-floating:has(a:focus-visible) {
+  background-color: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.section-nav.is-floating:has(a:focus-visible) .section-nav__label {
+  max-width: 12em;
+  margin-right: 0.7em;
+  opacity: 0.55;
+}
+
+.section-nav.is-floating:has(a:focus-visible) a.is-active .section-nav__label {
   opacity: 1;
 }
 
-.section-nav a.is-active::before {
-  width: 28px;
-  margin-right: 0;
+@media (hover: hover) {
+  .section-nav.is-floating:hover {
+    background-color: var(--glass-bg);
+    box-shadow: var(--glass-shadow);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+
+  .section-nav.is-floating:hover .section-nav__label {
+    max-width: 12em;
+    margin-right: 0.7em;
+    opacity: 0.55;
+  }
+
+  .section-nav.is-floating:hover a:hover .section-nav__label,
+  .section-nav.is-floating:hover a.is-active .section-nav__label {
+    opacity: 1;
+  }
 }
 
 /* seção ainda não construída */
@@ -633,11 +692,40 @@ a {
 }
 
 .job {
+  --p: 0;     /* posição do bloco na tela, -1 (abaixo) → 1 (acima) (JS) */
+  --amp: 1;
+
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   gap: clamp(24px, 4vw, 64px);
   padding: clamp(32px, 4vw, 56px) 0;
   border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+/* Parallax: cada camada da experiência anda numa velocidade diferente */
+.job__head {
+  align-self: start;
+  translate: 0 calc(var(--p) * var(--amp) * 70px);
+}
+
+/* desktop: o nome da empresa desliza pelo bloco, mais devagar que a página */
+@media (min-width: 861px) {
+  .job__head {
+    translate: 0 calc((var(--p) + 1) / 2 * var(--travel, 0px) * 0.75);
+  }
+}
+
+.role {
+  translate: 0 calc(var(--p) * var(--amp) * var(--depth, 24px));
+}
+
+.role:nth-child(2) { --depth: 44px; }
+.role:nth-child(3) { --depth: 64px; }
+
+.role__text {
+  translate: 0 calc(var(--p) * var(--amp) * 16px);
 }
 
 .job__company {
@@ -665,7 +753,7 @@ a {
 
 .role {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
+  grid-template-columns: 190px minmax(0, 1fr);
   align-items: baseline;
   gap: 8px 24px;
 }
@@ -696,6 +784,23 @@ a {
   color: var(--ink);
   font-size: 10px;
   letter-spacing: 0.12em;
+}
+
+/* texto de atuação de cada cargo */
+.role__text {
+  max-width: 62ch;
+  margin-top: 14px;
+  color: color-mix(in srgb, currentColor 78%, transparent);
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.6;
+}
+
+.role__text p {
+  margin: 0;
+}
+
+.role__text p + p {
+  margin-top: 0.9em;
 }
 
 .role__title {
@@ -1538,26 +1643,16 @@ a {
     transform: translateX(-55%);
   }
 
-  /* navegação vira uma pílula horizontal que aparece depois do hero */
+  /* navegação: escondida no hero, depois só as bolinhas no canto */
   .section-nav {
-    --pad-x: 6px;
-    --pad-y: 6px;
+    --pad-x: 10px;
+    --pad-y: 8px;
 
-    left: 50%;
-    right: auto;
-    bottom: 14px;
-    max-width: calc(100vw - 24px);
-    overflow-x: auto;
-    scrollbar-width: none;
-    border-radius: 999px;
-    translate: -50% 0;
+    right: 4px;
+    bottom: 20px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s, background-color 0.5s, box-shadow 0.5s;
-  }
-
-  .section-nav::-webkit-scrollbar {
-    display: none;
   }
 
   .section-nav.is-floating {
@@ -1565,27 +1660,8 @@ a {
     pointer-events: auto;
   }
 
-  .section-nav__list {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .section-nav a {
-    gap: 0.45em;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 13px;
-    white-space: nowrap;
-    transition: opacity 0.4s, background-color 0.4s, color 0.4s;
-  }
-
-  .section-nav a::before {
-    display: none;
-  }
-
-  .section-nav a.is-active {
-    background: var(--ink);
-    color: var(--cream);
+  .section-nav.is-floating a {
+    padding: 5px 0;
   }
 }
 
@@ -1619,6 +1695,10 @@ a {
   /* a linha mais longa ("selecionados") mede ~5,15em */
   .sec-title {
     font-size: min(calc((100vw - 2 * var(--gutter)) / 5.3), 120px);
+  }
+
+  .job {
+    --amp: 0.5;
   }
 
   .job,
