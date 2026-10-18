@@ -252,6 +252,78 @@
   }
 
   /* ------------------------------------------------------------------------
+     Projetos: cada subseção fica presa na tela e a rolagem vertical anda com
+     a linha de projetos na horizontal (1px de rolagem = 1px de linha). Quando
+     a linha termina, a página volta a rolar e o painel sai para cima.
+     --x (0 → 1): quanto da linha já passou · --p (-1 → 1): posição do painel
+     na troca entre subseções, usada no parallax do CSS
+     ------------------------------------------------------------------------ */
+  const rows = [...document.querySelectorAll('[data-hscroll]')].map((block) => ({
+    block,
+    pin: block.querySelector('.work__pin'),
+    rail: block.querySelector('.work__rail'),
+    track: block.querySelector('.work__track'),
+    dist: 0,
+    near: false,
+  }));
+
+  if (rows.length && !reduceMotion) {
+    root.classList.add('has-hscroll');
+
+    resizeTasks.push(() => {
+      rows.forEach((row) => {
+        row.dist = Math.max(0, Math.round(row.track.offsetWidth - row.rail.clientWidth));
+        row.block.style.height = `${row.pin.offsetHeight + row.dist}px`;
+        row.block.classList.toggle('is-static', row.dist === 0);
+      });
+    });
+
+    scrollTasks.push(() => {
+      const vh = window.innerHeight;
+      rows.forEach((row) => {
+        const r = row.block.getBoundingClientRect();
+        const h = row.pin.offsetHeight;
+
+        // as imagens fora da tela (à direita) não carregariam a tempo com lazy
+        if (!row.near && r.top < vh * 2) {
+          row.near = true;
+          row.block.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; });
+        }
+        if (r.bottom < -h || r.top > vh + h) return;
+
+        const x = row.dist ? clamp(-r.top / row.dist, 0, 1) : 0;
+        row.track.style.transform = `translate3d(${(-x * row.dist).toFixed(1)}px, 0, 0)`;
+        row.block.style.setProperty('--x', x.toFixed(4));
+
+        // topo do painel na tela: entrando (> 0), preso (0) ou saindo (< 0)
+        const top = r.top > 0 ? r.top : Math.min(0, r.bottom - h);
+        row.block.style.setProperty('--p', clamp(top / h, -1, 1).toFixed(4));
+      });
+    });
+
+    // o tamanho dos itens vem da altura da tela: remede quando a linha muda
+    const resized = new ResizeObserver(() => {
+      measure();
+      runScrollTasks();
+    });
+    rows.forEach((row) => resized.observe(row.track));
+
+    // Tab num link fora da tela: rola até a linha mostrar o item
+    rows.forEach((row) => {
+      row.track.addEventListener('focusin', (e) => {
+        const item = [...row.track.children].find((child) => child.contains(e.target));
+        if (!item || !row.dist) return;
+        const pad = parseFloat(getComputedStyle(row.track).paddingLeft);
+        const shown = clamp(-row.block.getBoundingClientRect().top, 0, row.dist);
+        const width = row.rail.clientWidth - pad * 2;
+        if (item.offsetLeft - pad >= shown && item.offsetLeft - pad + item.offsetWidth <= shown + width) return;
+        const blockTop = row.block.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: blockTop + clamp(item.offsetLeft - pad, 0, row.dist), behavior: 'instant' });
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------------
      Projetos: números que contam de 0 até o valor quando aparecem
      ------------------------------------------------------------------------ */
   const counters = [...document.querySelectorAll('[data-count]')];
