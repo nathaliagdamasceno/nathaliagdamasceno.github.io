@@ -741,16 +741,6 @@ a {
   gap: clamp(24px, 4vw, 64px);
 }
 
-.sec-lead {
-  max-width: 30ch;
-  margin: 0;
-  font-size: clamp(18px, 1.5vw, 24px);
-  font-weight: 500;
-  line-height: 1.3;
-  opacity: 0.78;
-  text-wrap: pretty;
-}
-
 .tags {
   display: flex;
   flex-wrap: wrap;
