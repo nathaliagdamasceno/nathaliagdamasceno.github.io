@@ -203,51 +203,136 @@
   document.querySelectorAll('[data-inview]').forEach((el) => inView.observe(el));
 
   /* ------------------------------------------------------------------------
-     Sobre: o texto "acende" palavra por palavra conforme a rolagem
+     Sobre (popup): abre pelo botão da foto do hero (ou "Sobre" no menu) e fecha
+     no X, no Esc, clicando fora ou ao rolar a página para baixo. Ao abrir, a
+     foto sobe, o título entra e o texto "acende" palavra por palavra.
      ------------------------------------------------------------------------ */
-  const text = document.querySelector('[data-reveal-words]');
+  const about = document.querySelector('dialog.about');
 
-  if (text && !reduceMotion) {
-    const walker = document.createTreeWalker(text, NodeFilter.SHOW_TEXT);
-    const textNodes = [];
-    while (walker.nextNode()) textNodes.push(walker.currentNode);
+  if (about && about.showModal) {
+    const text = about.querySelector('[data-reveal-words]');
+    let words = [];
+    let marks = [];
 
-    textNodes.forEach((node) => {
-      const fragment = document.createDocumentFragment();
-      node.textContent.split(/(\s+)/).forEach((part) => {
-        if (!part) return;
-        if (/^\s+$/.test(part)) {
-          fragment.append(part);
-        } else {
-          const word = document.createElement('span');
-          word.className = 'w';
-          word.textContent = part;
-          fragment.append(word);
-        }
+    if (text && !reduceMotion) {
+      const walker = document.createTreeWalker(text, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+      textNodes.forEach((node) => {
+        const fragment = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) {
+            fragment.append(part);
+          } else {
+            const word = document.createElement('span');
+            word.className = 'w';
+            word.textContent = part;
+            fragment.append(word);
+          }
+        });
+        node.replaceWith(fragment);
       });
-      node.replaceWith(fragment);
+
+      text.setAttribute('data-split', '');
+      words = [...text.querySelectorAll('.w')];
+      // cada palavra acende um pouco depois da anterior; o marca-texto pinta junto com a última dele
+      words.forEach((word, i) => { word.style.transitionDelay = `${0.5 + i * 0.025}s`; });
+      marks = [...text.querySelectorAll('mark')].map((mark) => {
+        const markWords = mark.querySelectorAll('.w');
+        mark.style.transitionDelay = markWords.length ? markWords[markWords.length - 1].style.transitionDelay : '0s';
+        return mark;
+      });
+    }
+
+    const setShown = (on) => {
+      about.classList.toggle('is-open', on);
+      words.forEach((word) => word.classList.toggle('is-on', on));
+      marks.forEach((mark) => mark.classList.toggle('is-on', on));
+    };
+
+    let openY = 0;
+    let closing = false;
+
+    // a foto do popup é lazy: começa a carregar quando o mouse chega na foto do hero
+    const aboutImg = about.querySelector('.about__photo img');
+    const preload = () => { if (aboutImg) aboutImg.loading = 'eager'; };
+    const heroFigure = document.querySelector('.hero__figure');
+    if (heroFigure) heroFigure.addEventListener('pointerenter', preload, { once: true });
+
+    const open = () => {
+      if (about.open) return;
+      closing = false;
+      about.classList.remove('is-closing');
+      preload();
+      about.showModal();
+      about.scrollTop = 0;
+      openY = window.scrollY;
+      void about.offsetWidth; // aplica o estado inicial antes de animar
+      setShown(true);
+    };
+
+    const close = () => {
+      if (!about.open || closing) return;
+      closing = true;
+      about.classList.add('is-closing');
+      const done = () => {
+        if (!closing) return;
+        about.close();
+        reset();
+      };
+      about.addEventListener('animationend', done, { once: true });
+      setTimeout(done, 400); // sem animação (movimento reduzido), fecha mesmo assim
+    };
+
+    // zera as animações para a próxima abertura (também no Esc, que fecha o <dialog> sozinho)
+    const reset = () => {
+      closing = false;
+      about.classList.remove('is-closing');
+      setShown(false);
+    };
+    about.addEventListener('close', reset);
+
+    document.querySelectorAll('.hero__more, a[href="#sobre"]').forEach((trigger) => {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        open();
+      });
     });
 
-    text.setAttribute('data-split', '');
-    const words = [...text.querySelectorAll('.w')];
-    const marks = [...text.querySelectorAll('mark')].map((mark) => {
-      const markWords = mark.querySelectorAll('.w');
-      return { mark, last: markWords[markWords.length - 1] };
+    about.querySelector('.about__close').addEventListener('click', close);
+
+    // clique no fundo escuro (fora da caixa do popup)
+    about.addEventListener('click', (e) => {
+      if (e.target !== about) return;
+      const r = about.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close();
     });
-    let shown = -1;
+
+    // rolar para baixo fecha; se o popup tem rolagem própria (celular), só depois do fim dela
+    const atEnd = () => about.scrollTop + about.clientHeight >= about.scrollHeight - 2;
+
+    document.addEventListener('wheel', (e) => {
+      if (about.open && e.deltaY > 0 && (!about.contains(e.target) || atEnd())) close();
+    }, { passive: true });
+
+    let touchY = null;
+    document.addEventListener('touchstart', (e) => {
+      touchY = about.open ? e.touches[0].clientY : null;
+    }, { passive: true });
+    document.addEventListener('touchmove', (e) => {
+      if (touchY === null || !about.open) return;
+      // dedo subindo = rolagem para baixo
+      if (touchY - e.touches[0].clientY > 24 && (!about.contains(e.target) || atEnd())) close();
+    }, { passive: true });
+
+    document.addEventListener('keydown', (e) => {
+      if (about.open && ['ArrowDown', 'PageDown', ' '].includes(e.key) && atEnd()) close();
+    });
 
     scrollTasks.push(() => {
-      const r = text.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // começa quando o topo do texto chega a 90% da tela, termina quando o fim chega a 70%
-      // (ou quando a página acaba, para nunca sobrar palavra apagada)
-      const atBottom = window.scrollY + vh >= document.documentElement.scrollHeight - 2;
-      const progress = atBottom ? 1 : clamp((vh * 0.9 - r.top) / (r.height + vh * 0.2), 0, 1);
-      const count = Math.round(progress * words.length);
-      if (count === shown) return;
-      shown = count;
-      words.forEach((word, i) => word.classList.toggle('is-on', i < count));
-      marks.forEach(({ mark, last }) => mark.classList.toggle('is-on', Boolean(last) && last.classList.contains('is-on')));
+      if (about.open && Math.abs(window.scrollY - openY) > 4) close();
     });
   }
 

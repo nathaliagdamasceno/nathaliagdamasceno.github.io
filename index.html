@@ -40,6 +40,8 @@
              width="1271" height="2191"
              alt="Nathália Damasceno, de blusa branca e braços cruzados, sorrindo para a câmera"
              fetchpriority="high" decoding="async">
+        <!-- aparece ao passar o mouse na foto; abre o Sobre num popup -->
+        <button class="hero__more" type="button" aria-haspopup="dialog" aria-controls="sobre">Saiba mais sobre mim</button>
       </figure>
     </div>
 
@@ -56,41 +58,41 @@
     <ol class="section-nav__list">
       <li><a href="#sobre"><span class="section-nav__label">Sobre</span><span class="section-nav__dot" aria-hidden="true"></span></a></li>
       <li><a href="#experiencia"><span class="section-nav__label">Experiência</span><span class="section-nav__dot" aria-hidden="true"></span></a></li>
-      <li><a href="#habilidades"><span class="section-nav__label">Habilidades</span><span class="section-nav__dot" aria-hidden="true"></span></a></li>
       <li><a href="#projetos"><span class="section-nav__label">Projetos</span><span class="section-nav__dot" aria-hidden="true"></span></a></li>
       <li><a href="#contato"><span class="section-nav__label">Contato</span><span class="section-nav__dot" aria-hidden="true"></span></a></li>
     </ol>
   </nav>
 
-  <main>
+  <!-- 02 · SOBRE: popup aberto pelo botão da foto do hero; some ao rolar a página -->
+  <dialog class="about" id="sobre" aria-labelledby="sobre-title">
+    <button class="about__close" type="button" aria-label="Fechar">×</button>
+    <figure class="about__photo">
+      <img src="images/sobre-nathalia-1400.webp"
+           srcset="images/sobre-nathalia-800.webp 800w, images/sobre-nathalia-1400.webp 1400w"
+           sizes="(max-width: 860px) 100vw, 540px"
+           width="1400" height="2100" loading="lazy" decoding="async"
+           alt="Nathália de beca e capelo, segurando o canudo azul da Unisinos e olhando para o lado">
+    </figure>
 
-    <!-- 02 · SOBRE -->
-    <section class="about" id="sobre" aria-labelledby="sobre-title">
-      <figure class="about__photo" data-inview>
-        <img src="images/sobre-nathalia-1400.webp"
-             srcset="images/sobre-nathalia-800.webp 800w, images/sobre-nathalia-1400.webp 1400w"
-             sizes="(max-width: 860px) 100vw, 46vw"
-             width="1400" height="2100" loading="lazy" decoding="async"
-             alt="Nathália de beca e capelo, segurando o canudo azul da Unisinos e olhando para o lado">
-      </figure>
+    <div class="about__content">
 
-      <div class="about__content">
+      <h2 class="sec-title about__title" id="sobre-title">
+        <span class="sec-line"><span class="sec-line-inner"><em>Prazer,</em></span></span>
+        <span class="sec-line"><span class="sec-line-inner">sou a Nathália</span></span>
+      </h2>
 
-        <h2 class="sec-title about__title" id="sobre-title" data-inview>
-          <span class="sec-line"><span class="sec-line-inner"><em>Prazer,</em></span></span>
-          <span class="sec-line"><span class="sec-line-inner">sou a Nathália</span></span>
-        </h2>
-
-        <div class="about__text" data-reveal-words>
-          <p>Formada em Marketing pela Unisinos, comecei como social media e hoje lidero estratégias de
-          <strong>conteúdo, CRM e mídia paga</strong> como Analista de Marketing.</p>
-          <p>Já fiz marketing para educação, saúde, advocacia, setor funerário e tecnologia. Passar por
-          públicos tão diferentes me deixou <mark>rápida em entender um universo novo</mark> e adaptar a
-          mensagem sem descaracterizar a marca.</p>
-        </div>
+      <div class="about__text" data-reveal-words>
+        <p>Formada em Marketing pela Unisinos, comecei como social media e hoje lidero estratégias de
+        <strong>conteúdo, CRM e mídia paga</strong> como Analista de Marketing.</p>
+        <p>Atuei no marketing de educação, saúde, advocacia, setor funerário e tecnologia. Passar por
+        públicos tão diferentes me deixou <mark>rápida em entender um universo novo</mark> e adaptar a
+        mensagem sem descaracterizar a marca.</p>
       </div>
+    </div>
 
-    </section>
+  </dialog>
+
+  <main>
 
     <!-- 03 · EXPERIÊNCIA -->
     <section class="sec exp" id="experiencia" aria-labelledby="exp-title">
@@ -117,7 +119,16 @@
                   <p>Atuo com marketing digital, conteúdo e CRM. Entre minhas responsabilidades, estão o acompanhamento de KPIs e a elaboração de relatórios para apoiar a tomada de decisão, a estruturação de fluxos de automação para nutrição de leads e comunicação segmentada, além da produção de conteúdo para diferentes canais. Também realizo a cobertura de eventos e feiras, criando conteúdo em tempo real para fortalecer a presença e o posicionamento da marca.</p>
                   <p>Contribuí para o crescimento da marca nas redes sociais. Dobramos a base de seguidores do Instagram (+100%), com alcance mensal equivalente a 9x a base e ~3,3 visualizações por conta alcançada.</p>
                   <p>Participei no rebranding da marca, da criação dos novos materiais e da adaptação de todos os canais, garantindo consistência em todos os pontos de contato. Também participei do projeto de migração do RD Station para HubSpot, na migração do site, landing pages, fluxos de automação e contatos, sem perda de dados e mantendo as campanhas ativas durante a transição.</p>
+                  <p>Também incorporei IA generativa ao fluxo de marketing: desenvolvo skills e agentes no Claude que padronizam e aceleram a produção de conteúdo com base nas diretrizes da marca, e utilizo a ferramenta para estruturar e construir páginas.</p>
                 </div>
+                <ul class="role__tools" aria-label="Ferramentas">
+                  <li>RD Station</li>
+                  <li>HubSpot</li>
+                  <li>Google Analytics</li>
+                  <li>WordPress</li>
+                  <li>Copywriting</li>
+                  <li>Skills e Agentes com Claude AI</li>
+                </ul>
               </div>
             </li>
           </ol>
@@ -136,6 +147,16 @@
                 <div class="role__text">
                   <p>Responsável pelo planejamento estratégico das redes sociais e pela criação de conteúdo, contemplando a edição de vídeos e a gestão das publicações diárias nas plataformas. Atuei na concepção de campanhas e na negociação de orçamentos com fornecedores. Adicionalmente, conduzi a análise de resultados digitais, incluindo o gerenciamento de campanhas de Facebook Ads e Google Ads, visando à otimização contínua da performance.</p>
                 </div>
+                <ul class="role__tools" aria-label="Ferramentas">
+                  <li>Meta Ads</li>
+                  <li>Google Ads</li>
+                  <li>Edição de vídeo</li>
+                  <li>CapCut</li>
+                  <li>Canva</li>
+                  <li>Photoshop</li>
+                  <li>Illustrator</li>
+                  <li>Corel Draw</li>
+                </ul>
               </div>
             </li>
             <li class="role">
@@ -158,81 +179,7 @@
       </div>
     </section>
 
-    <!-- 04 · HABILIDADES & CURSOS -->
-    <section class="sec skills" id="habilidades" aria-labelledby="skills-title">
-
-      <div class="sec-head">
-        <h2 class="sec-title" id="skills-title" data-inview>
-          <span class="sec-line"><span class="sec-line-inner">Habilidades</span></span>
-          <span class="sec-line"><span class="sec-line-inner"><em>&amp; cursos</em></span></span>
-        </h2>
-        <p class="sec-lead">As ferramentas do dia a dia, o jeito de trabalhar e o que venho estudando.</p>
-      </div>
-
-      <div class="skills__block">
-        <h3 class="eyebrow">Técnicas</h3>
-        <ol class="tech">
-          <li class="tech__row">
-            <span class="tech__num">01</span>
-            <p class="tech__name">CRM e automação</p>
-            <ul class="tech__tools"><li>RD Station</li><li>HubSpot</li></ul>
-          </li>
-          <li class="tech__row">
-            <span class="tech__num">02</span>
-            <p class="tech__name">Mídia paga</p>
-            <ul class="tech__tools"><li>Meta Ads</li><li>Google Ads</li></ul>
-          </li>
-          <li class="tech__row">
-            <span class="tech__num">03</span>
-            <p class="tech__name">Análise</p>
-            <ul class="tech__tools"><li>KPIs</li><li>Google Analytics</li><li>Relatórios de performance</li></ul>
-          </li>
-          <li class="tech__row">
-            <span class="tech__num">04</span>
-            <p class="tech__name">Conteúdo</p>
-            <ul class="tech__tools"><li>Copywriting</li><li>Criação para redes sociais</li><li>Edição de vídeo</li></ul>
-          </li>
-          <li class="tech__row">
-            <span class="tech__num">05</span>
-            <p class="tech__name">Design</p>
-            <ul class="tech__tools"><li>Corel Draw</li><li>Photoshop</li><li>Illustrator</li><li>Canva</li><li>CapCut</li></ul>
-          </li>
-          <li class="tech__row">
-            <span class="tech__num">06</span>
-            <p class="tech__name">Outras</p>
-            <ul class="tech__tools"><li>WordPress</li><li>Skills e Agentes com Claude AI</li></ul>
-          </li>
-        </ol>
-      </div>
-
-      <div class="skills__grid">
-        <div class="skills__block">
-          <h3 class="eyebrow">Comportamentais</h3>
-          <ul class="stickers">
-            <li style="--r: -5deg">Criatividade</li>
-            <li style="--r: 3deg">Olhar clínico para criações</li>
-            <li style="--r: -2deg">Adaptabilidade</li>
-            <li style="--r: 6deg">Gestão de tempo</li>
-            <li style="--r: -7deg">Proatividade</li>
-            <li style="--r: 2deg">Trabalho em equipe</li>
-          </ul>
-        </div>
-
-        <div class="skills__block">
-          <h3 class="eyebrow">Cursos</h3>
-          <ol class="courses">
-            <li><span class="courses__name">Formação em Copywriting</span><span class="courses__school">Clube Share</span></li>
-            <li><span class="courses__name">Liderança</span><span class="courses__school">Conquer</span></li>
-            <li><span class="courses__name">Google Ads</span><span class="courses__school">Udemy</span></li>
-            <li><span class="courses__name">Corel Draw</span><span class="courses__school">Udemy</span></li>
-            <li><span class="courses__name">Photoshop e Illustrator</span><span class="courses__school">Design com Você</span></li>
-            <li><span class="courses__name">Google Analytics</span><span class="courses__school">Google</span></li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- 05 · PROJETOS -->
+    <!-- 04 · PROJETOS -->
     <section class="sec work" id="projetos" aria-labelledby="work-title">
 
       <div class="sec-head">
@@ -430,10 +377,11 @@
               <figure><img src="images/projetos/impresso-flyer.webp" width="336" height="405" loading="lazy" decoding="async" alt="Flyer da Gabster: O seu dia a dia mais produtivo"></figure>
               <figure><img src="images/projetos/impresso-ecobag.webp" width="628" height="641" loading="lazy" decoding="async" alt="Estampa da ecobag Gabster e SketchUp"></figure>
               <figure><img src="images/projetos/impresso-folder.webp" width="599" height="449" loading="lazy" decoding="async" alt="Folder da Gabster aberto"></figure>
-              <figure class="is-mockup"><span class="mockup"><img src="images/projetos/impresso-clientes.webp" width="290" height="394" loading="lazy" decoding="async" alt="Banner da Clinicentro, consultas e exames médicos"></span></figure>
               <figure><img src="images/projetos/impresso-evento.webp" width="480" height="360" loading="lazy" decoding="async" alt="Folder da Gabster com o mapa de produtores"></figure>
-              <figure><img src="images/projetos/impresso-outdoor.webp" width="634" height="387" loading="lazy" decoding="async" alt="Outdoor da Gabster à beira da estrada: Acabe com o ruído entre projeto 3D e produção"></figure>
+              <figure><img src="images/projetos/impresso-outdoor.webp" width="470" height="287" loading="lazy" decoding="async" alt="Outdoor da Gabster à beira da estrada: Acabe com o ruído entre projeto 3D e produção"></figure>
               <figure><img src="images/projetos/impresso-letreiro-clinicentro.webp" width="882" height="733" loading="lazy" decoding="async" alt="Letreiro da Clinicentro, consultas e exames médicos, na parede da recepção"></figure>
+              <figure><img src="images/projetos/impresso-cartao-clinicentro.webp" width="1299" height="880" loading="lazy" decoding="async" alt="Atendente da Clinicentro entregando o cartão Clinicentro Assist, saúde acessível"></figure>
+              <figure><img src="images/projetos/impresso-flyer-clinicentro.webp" width="1321" height="880" loading="lazy" decoding="async" alt="Atendente da Clinicentro entregando o flyer do Clinicentro Assist com mensalidades a partir de R$ 19,90"></figure>
               <figure><img src="images/projetos/impresso-letreiro-funeraria.webp" width="1170" height="646" loading="lazy" decoding="async" alt="Fachada da Funerária São Pedro com letreiro e wind banner verde: Funerária Verde"></figure>
               <figure><img src="images/projetos/impresso-wide-banner.webp" width="660" height="880" loading="lazy" decoding="async" alt="Equipe na calçada segurando o wide banner Dia da Saúde Feliz do Plano Tudo Azul: consulta médica por R$ 29,00"></figure>
               <figure><img src="images/projetos/impresso-banner.webp" width="626" height="880" loading="lazy" decoding="async" alt="Mulher na faixa de pedestres erguendo o banner Dia da Saúde Feliz do Plano Tudo Azul"></figure>
@@ -491,7 +439,7 @@
       </div>
     </section>
 
-    <!-- 06 · CONTATO -->
+    <!-- 05 · CONTATO -->
     <section class="contact" id="contato" aria-labelledby="contact-title">
       <div class="contact__inner">
 

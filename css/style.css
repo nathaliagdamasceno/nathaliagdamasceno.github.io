@@ -230,6 +230,53 @@ a {
   filter: drop-shadow(22px 18px 40px rgb(66 51 44 / 0.2));
 }
 
+/* Botão "Saiba mais sobre mim": aparece ao passar o mouse na foto */
+.hero__more {
+  position: absolute;
+  left: 57%;
+  top: 58%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  color: var(--ink);
+  font: 600 clamp(15px, 1.1vw, 17px) / 1 var(--font);
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  translate: -50% 12px;
+  transition: opacity 0.4s, translate 0.5s var(--ease-out), background-color 0.3s, color 0.3s;
+}
+
+.hero__more::after {
+  content: "↗";
+}
+
+.hero__figure:hover .hero__more,
+.hero__more:focus-visible {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+.hero__more:hover {
+  background-color: var(--ink);
+  color: var(--cream);
+}
+
+/* sem mouse (celular): o botão fica sempre visível */
+@media (hover: none) {
+  .hero__more {
+    opacity: 1;
+    translate: -50% 0;
+  }
+}
+
 /* --- Frase de impacto ---------------------------------------------------- */
 
 .hero__aside {
@@ -439,15 +486,81 @@ a {
    02 · SOBRE
    ========================================================================== */
 
+/* Popup (<dialog>): aberto pelo botão da foto do hero, fecha ao rolar a página */
 .about {
+  width: min(1180px, 100vw - 2 * var(--gutter));
+  height: min(760px, 100svh - 2 * var(--gutter));
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--cream);
+  color: var(--ink);
+  box-shadow: 0 40px 100px -30px rgb(31 24 20 / 0.6);
+  container-type: inline-size;
+}
+
+.about[open] {
   display: grid;
   grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
-  overflow-x: clip;
-  background: var(--cream);
+  animation: about-in 0.6s var(--ease-out);
+}
+
+.about.is-closing {
+  animation: about-out 0.3s ease-in forwards;
+}
+
+.about::backdrop {
+  background: rgb(31 24 20 / 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: fade 0.5s;
+}
+
+.about.is-closing::backdrop {
+  animation: fade 0.3s reverse forwards;
+}
+
+@keyframes about-in {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); }
+}
+
+@keyframes about-out {
+  to { opacity: 0; transform: translateY(24px) scale(0.98); }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+.about__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  font: 300 28px / 1 var(--font);
+  cursor: pointer;
+  transition: rotate 0.4s var(--ease-out);
+}
+
+.about__close:hover {
+  rotate: 90deg;
 }
 
 .about__photo {
-  height: clamp(560px, 100svh, 1000px);
+  height: 100%;
   margin: 0;
   overflow: hidden;
 }
@@ -492,8 +605,8 @@ a {
 }
 
 .about__title {
-  /* "sou a Nathália :)" mede ~6,8em e precisa caber numa linha da coluna */
-  font-size: clamp(48px, 6.4vw, 120px);
+  /* "sou a Nathália" mede ~5,9em e precisa caber numa linha da coluna */
+  font-size: clamp(40px, (54cqi - 140px) / 6.1, 104px);
 }
 
 /* ":)" deitado num selo: gira 90° e vira um rostinho */
@@ -523,7 +636,7 @@ a {
 .about__text {
   max-width: 34em;
   margin-top: clamp(24px, 3vw, 44px);
-  font-size: clamp(17px, 1.3vw, 21px);
+  font-size: clamp(16px, 1.25vw, 20px);
   font-weight: 500;
   line-height: 1.6;
 }
@@ -556,7 +669,7 @@ a {
     transition: clip-path 1.4s var(--ease-out), scale 2s var(--ease-out);
   }
 
-  .js .about__photo.is-in img {
+  .about.is-open .about__photo img {
     clip-path: inset(0 0 0 0);
     scale: 1;
   }
@@ -570,7 +683,8 @@ a {
     transition-delay: 0.1s;
   }
 
-  .js .sec-title.is-in .sec-line-inner {
+  .js .sec-title.is-in .sec-line-inner,
+  .about.is-open .sec-line-inner {
     transform: none;
   }
 
@@ -811,192 +925,35 @@ a {
   letter-spacing: -0.02em;
 }
 
-/* ==========================================================================
-   04 · HABILIDADES & CURSOS
-   ========================================================================== */
-
-.skills {
-  background: var(--beige);
-  color: var(--ink);
-}
-
-.skills__block {
-  margin-top: clamp(64px, 8vw, 120px);
-}
-
-.skills__block > .eyebrow {
-  margin-bottom: 18px;
-}
-
-/* Lista-índice: a linha "acende" em preto ao passar o mouse */
-.tech {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-}
-
-.tech__row {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: clamp(36px, 5vw, 72px) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(12px, 2vw, 32px);
-  padding: clamp(16px, 2vw, 28px) clamp(8px, 1.2vw, 20px);
-  border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
-  transition: color 0.45s var(--ease-out);
-}
-
-.tech__row::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--ink);
-  scale: 1 0;
-  transform-origin: 50% 100%;
-  transition: scale 0.5s var(--ease-out);
-}
-
-.tech__row:hover {
-  color: var(--cream);
-}
-
-.tech__row:hover::before {
-  scale: 1 1;
-}
-
-.tech__num {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  opacity: 0.6;
-}
-
-.tech__name {
-  margin: 0;
-  font-size: clamp(28px, 4.2vw, 68px);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.035em;
-  transition: translate 0.5s var(--ease-out);
-}
-
-.tech__row:hover .tech__name {
-  translate: clamp(8px, 1.5vw, 24px) 0;
-}
-
-.tech__tools {
+/* ferramentas do cargo, logo abaixo do texto */
+.role__tools {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-  margin: 0;
+  gap: 4px 0;
+  max-width: 62ch;
+  margin: 18px 0 0;
   padding: 0;
   list-style: none;
+  color: color-mix(in srgb, currentColor 78%, transparent);
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 500;
+  translate: 0 calc(var(--p) * var(--amp) * 16px);
 }
 
-.tech__tools li {
-  padding: 7px 14px;
-  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
-  border-radius: 999px;
-  font-size: clamp(13px, 1vw, 15px);
-  font-weight: 500;
+.role__tools li {
   white-space: nowrap;
 }
 
-.skills__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(40px, 6vw, 112px);
-}
-
-/* Adesivos */
-.stickers {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px 10px;
-  margin: 0;
-  padding: 8px 0;
-  list-style: none;
-}
-
-.stickers li {
-  position: relative;
-  padding: 0.42em 0.95em;
-  border-radius: 999px;
-  background: var(--cream);
-  color: var(--ink);
-  font-size: clamp(20px, 2.1vw, 34px);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  rotate: var(--r, 0deg);
-  box-shadow: 0 10px 24px -12px rgb(66 51 44 / 0.45);
-  user-select: none;
-  transition: rotate 0.45s var(--ease-out), scale 0.45s var(--ease-out);
-}
-
-.stickers li:nth-child(3n + 2) {
-  background: var(--ink);
-  color: var(--cream);
-}
-
-.stickers li:nth-child(3n) {
-  background: var(--mauve);
-  color: var(--ink);
-}
-
-.stickers li:hover {
-  rotate: 0deg;
-  scale: 1.05;
-}
-
-.courses {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: course;
-  border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-}
-
-.courses li {
-  counter-increment: course;
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-}
-
-.courses li::before {
-  content: counter(course, decimal-leading-zero);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  opacity: 0.6;
-}
-
-.courses__name {
-  font-size: clamp(18px, 1.6vw, 24px);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.courses__school {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-align: right;
-  text-transform: uppercase;
-  opacity: 0.65;
+/* hífen pequeno entre as ferramentas */
+.role__tools li + li::before {
+  content: "-";
+  margin: 0 0.6em;
+  font-size: 0.75em;
+  opacity: 0.55;
 }
 
 /* ==========================================================================
-   05 · PROJETOS
+   04 · PROJETOS
    ========================================================================== */
 
 .work {
@@ -1359,49 +1316,6 @@ a {
   transition: scale 0.8s var(--ease-out);
 }
 
-/* Clinicentro como mockup 3D: o banner "em pé", sem fundo, com sombra e brilho de papel */
-.print .is-mockup {
-  display: grid;
-  place-items: center;
-  height: var(--img-h);
-  aspect-ratio: 0.85;
-  overflow: visible;
-  background: transparent;
-  perspective: 900px;
-}
-
-.mockup {
-  position: relative;
-  height: 84%;
-  aspect-ratio: 290 / 394;
-  overflow: hidden;
-  border-radius: 3px;
-  box-shadow:
-    3px 3px 0 #e2dad0,                              /* espessura do papel */
-    22px 26px 30px -10px rgb(66 51 44 / 0.38),
-    6px 8px 12px rgb(66 51 44 / 0.16);
-  transform: rotateY(-22deg) rotateX(8deg) rotateZ(-3deg);
-  transition: transform 0.9s var(--ease-out);
-}
-
-.mockup img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mockup::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, rgb(255 255 255 / 0.4) 0%, transparent 38%, transparent 70%, rgb(66 51 44 / 0.12) 100%);
-  pointer-events: none;
-}
-
-.print .is-mockup:hover .mockup {
-  transform: rotateY(-8deg) rotateX(4deg) rotateZ(-1deg);
-}
-
 .print figure:hover > img {
   scale: 1.04;
 }
@@ -1553,7 +1467,7 @@ a {
 }
 
 /* ==========================================================================
-   06 · CONTATO + rodapé
+   05 · CONTATO + rodapé
    ========================================================================== */
 
 .contact {
@@ -1772,28 +1686,32 @@ a {
   }
 }
 
-/* Sobre empilhado */
+/* Sobre empilhado: foto em cima, texto embaixo, o popup rola por dentro */
 @media (max-width: 860px) {
   .about {
+    height: auto;
+    max-height: calc(100svh - 2 * var(--gutter));
+    border-radius: 20px;
+  }
+
+  .about[open] {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .about__photo {
-    height: auto;
-    aspect-ratio: 4 / 5;
-    max-height: 92svh;
+    height: min(52svh, 120cqi);
   }
 
   .about__content {
-    padding: clamp(32px, 7vw, 64px) var(--gutter) clamp(56px, 12vw, 96px);
+    padding: clamp(28px, 7vw, 56px) var(--gutter) clamp(36px, 8vw, 64px);
   }
 
   .sec-title.about__title {
-    font-size: min(calc((100vw - 2 * var(--gutter)) / 6.9), 120px);
+    font-size: min((100cqi - 2 * var(--gutter)) / 6.1, 96px);
   }
 }
 
-/* Seções 03–06 no celular / tablet */
+/* Seções 03–05 no celular / tablet */
 @media (max-width: 860px) {
   .sec-head {
     grid-template-columns: minmax(0, 1fr);
@@ -1810,20 +1728,6 @@ a {
 
   .job,
   .role {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .tech__row {
-    grid-template-columns: 32px minmax(0, 1fr);
-    row-gap: 12px;
-  }
-
-  .tech__tools {
-    grid-column: 2;
-    justify-content: flex-start;
-  }
-
-  .skills__grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
