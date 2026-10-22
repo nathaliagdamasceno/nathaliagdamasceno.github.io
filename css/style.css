@@ -486,7 +486,7 @@ a {
    02 · SOBRE
    ========================================================================== */
 
-/* Popup (<dialog>): aberto pelo botão da foto do hero, fecha ao rolar a página */
+/* Popup (<dialog>): aberto pelo botão da foto do hero */
 .about {
   width: min(1180px, 100vw - 2 * var(--gutter));
   height: min(760px, 100svh - 2 * var(--gutter));
@@ -511,6 +511,12 @@ a {
 
 .about.is-closing {
   animation: about-out 0.3s ease-in forwards;
+}
+
+/* popup aberto: a página por trás não rola (o gutter evita o pulo da barra de rolagem) */
+.is-locked {
+  overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 .about::backdrop {
@@ -1603,10 +1609,10 @@ a {
   }
 
   .hero {
-    /* "Damasceno" (italic leve) mede ~5em e define a largura do bloco;
-       "Nathália" (1.4em) tem a mesma largura → bloco justificado */
+    /* "Damasceno" mede ~5em e define a largura do bloco;
+       "Nathália" (1.44em) tem a mesma largura → bloco justificado */
     --name-fs: min(calc((100vw - 2 * var(--gutter)) / 5.1), 12vh);
-    --name-h: calc(var(--name-fs) * 0.84 * 2.4);
+    --name-h: calc(var(--name-fs) * 0.84 * 2.44);
   }
 
   .hero__name {
@@ -1620,8 +1626,9 @@ a {
     gap: 0;
   }
 
-  .hero__word:not(.hero__word--light) {
-    font-size: 1.4em;
+  /* só "Nathália" (a última palavra é "Damasceno") */
+  .hero__word:not(:last-child) {
+    font-size: 1.44em;
   }
 
   /* frase em creme sobre um degradê escuro na base da foto */

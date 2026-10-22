@@ -204,8 +204,8 @@
 
   /* ------------------------------------------------------------------------
      Sobre (popup): abre pelo botão da foto do hero (ou "Sobre" no menu) e fecha
-     no X, no Esc, clicando fora ou ao rolar a página para baixo. Ao abrir, a
-     foto sobe, o título entra e o texto "acende" palavra por palavra.
+     no X, no Esc ou clicando fora. Enquanto aberto, a página por trás não rola.
+     Ao abrir, a foto sobe, o título entra e o texto "acende" palavra por palavra.
      ------------------------------------------------------------------------ */
   const about = document.querySelector('dialog.about');
 
@@ -247,12 +247,12 @@
     }
 
     const setShown = (on) => {
+      root.classList.toggle('is-locked', on);
       about.classList.toggle('is-open', on);
       words.forEach((word) => word.classList.toggle('is-on', on));
       marks.forEach((mark) => mark.classList.toggle('is-on', on));
     };
 
-    let openY = 0;
     let closing = false;
 
     // a foto do popup é lazy: começa a carregar quando o mouse chega na foto do hero
@@ -268,7 +268,6 @@
       preload();
       about.showModal();
       about.scrollTop = 0;
-      openY = window.scrollY;
       void about.offsetWidth; // aplica o estado inicial antes de animar
       setShown(true);
     };
@@ -308,31 +307,6 @@
       if (e.target !== about) return;
       const r = about.getBoundingClientRect();
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close();
-    });
-
-    // rolar para baixo fecha; se o popup tem rolagem própria (celular), só depois do fim dela
-    const atEnd = () => about.scrollTop + about.clientHeight >= about.scrollHeight - 2;
-
-    document.addEventListener('wheel', (e) => {
-      if (about.open && e.deltaY > 0 && (!about.contains(e.target) || atEnd())) close();
-    }, { passive: true });
-
-    let touchY = null;
-    document.addEventListener('touchstart', (e) => {
-      touchY = about.open ? e.touches[0].clientY : null;
-    }, { passive: true });
-    document.addEventListener('touchmove', (e) => {
-      if (touchY === null || !about.open) return;
-      // dedo subindo = rolagem para baixo
-      if (touchY - e.touches[0].clientY > 24 && (!about.contains(e.target) || atEnd())) close();
-    }, { passive: true });
-
-    document.addEventListener('keydown', (e) => {
-      if (about.open && ['ArrowDown', 'PageDown', ' '].includes(e.key) && atEnd()) close();
-    });
-
-    scrollTasks.push(() => {
-      if (about.open && Math.abs(window.scrollY - openY) > 4) close();
     });
   }
 
